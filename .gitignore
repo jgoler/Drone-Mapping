@@ -1,2 +1,7 @@
 .idea/
 __pycache__/
+input_paths/
+data/
+*.jpg
+*.png
+*.mp4
