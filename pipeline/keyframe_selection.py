@@ -9,8 +9,6 @@ import numpy as np
 
 
 def select_keyframes(input_folder, output_folder, percentage, algorithm=""):
-    output_folder = ""
-
     # get list of all frames in order
     frames = [os.path.join(input_folder, f) for f in os.listdir(input_folder) if f.endswith(".jpg") or f.endswith(".png")]
     try:
@@ -29,6 +27,10 @@ def select_keyframes(input_folder, output_folder, percentage, algorithm=""):
         frame_indices = np.random.choice(len(frames), size=num_frames, replace=False)
         frame_indices.sort()
     selected_frames = [frames[i] for i in frame_indices]
+
+    # create the output folder if it doesn't exist
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
 
     # copy the selected frames to the output folder
     for i, frame in enumerate(selected_frames):

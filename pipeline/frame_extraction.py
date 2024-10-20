@@ -21,7 +21,7 @@ def extract_frames(video_path, output_folder):
         print(f"Error: Could not open video {video_path}")
         return
 
-    frame_count = 0
+    success_count = frame_count = 0
 
     while True:
         # Read the next frame from the video
@@ -33,13 +33,16 @@ def extract_frames(video_path, output_folder):
 
         # Save the current frame as an image file
         frame_filename = os.path.join(output_folder, f"frame_{frame_count:04d}.jpg")
-        cv2.imwrite(frame_filename, frame)
+        success = cv2.imwrite(frame_filename, frame)
 
+        success_count += success
         frame_count += 1
 
     # Release the video capture object
     video.release()
-    print(f"Extracted {frame_count} frames to {output_folder}")
+    print(f"Extracted {success_count} frames to {output_folder}.")
+    if frame_count > success_count:
+        print(f"Warning: {frame_count - success_count} frames were not extracted.")
 
 
 if __name__ == "__main__":
