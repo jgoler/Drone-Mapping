@@ -27,7 +27,7 @@ def main():
     percentages = input_paths["percentages"]  # what percent of frames to select
     algorithms = ["n", "r"]
     
-    # extract frames
+    # extract frames and select keyframes
     FRAMES_FOLDER = os.path.join(repo_path, "data", "frames")
     KF_FOLDER = os.path.join(repo_path, "data", "keyframes")
     for video_path in video_paths:
@@ -37,20 +37,30 @@ def main():
     
     # get frame folders for each video and select keyframes according to desired percentages and algorithms
     vid_frame_folders = get_immediate_subdirectories(FRAMES_FOLDER)
-    out_folder_paths = []
+    kf_folder_paths = []
+    processed_folder_paths = []  # output folders for Colmap (ns-process) processing
     for vid_frame_folder in vid_frame_folders:
         for percent in percentages:
             for algorithm in algorithms:
                 frame_folder_path = os.path.join(FRAMES_FOLDER, vid_frame_folder)
-                out_folder_path = os.path.join(KF_FOLDER, os.path.basename(vid_frame_folder), f"{percent}p_{algorithm}")
-                print("frame_folder_path: ", frame_folder_path)
-                print("outpath: ", out_folder_path)
-                fraction = percent/100
-                kf_idxs = select_keyframes(frame_folder_path, out_folder_path, fraction, "n")
-                out_folder_paths.append(out_folder_path)
+                video_name = os.path.basename(vid_frame_folder)
+                kf_folder_path = os.path.join(KF_FOLDER, video_name, f"{percent}p_{algorithm}")
+                processed_folder_path = os.path.join(repo_path, "data", "processed", video_name, f"{percent}p_{algorithm}")
+                # check if keyframes already selected (i.e. kf folder already exists)
+                if os.path.exists(kf_folder_path):
+                    print(f"Keyframes already exist in '{kf_folder_path}'")
+                else:
+                    # if not, run keyframe selection algorithm
+                    fraction = percent/100
+                    kf_idxs = select_keyframes(frame_folder_path, kf_folder_path, fraction, algorithm)
+                    print(f"Successfully added keyframes to '{kf_folder_path}'")
+                kf_folder_paths.append(kf_folder_path)
+                processed_folder_paths.append(processed_folder_path)
 
     # export to txt
-    export_to_txt(out_folder_paths, "kf_outfolders.txt")
+    export_to_txt(kf_folder_paths, "kf_folders.txt")
+    export_to_txt(processed_folder_paths, "processed_folders.txt")
+
 
 
 if __name__ == "__main__":
