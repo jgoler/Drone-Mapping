@@ -21,11 +21,11 @@ from utils import *
 
 def main():
     # collect paths
-    input_paths = read_input_paths()
-    repo_path = input_paths["repo"]
-    video_paths = input_paths["videos"]
-    percentages = input_paths["percentages"]  # what percent of frames to select
-    algorithms = ["n", "r"]
+    config = get_config()
+    repo_path = config["repo"]
+    video_paths = config["videos"]
+    percentages = config["percentages"]  # what percent of frames to select
+    algorithms = config["algorithms"]
     
     # extract frames and select keyframes
     FRAMES_FOLDER = os.path.join(repo_path, "data", "frames")

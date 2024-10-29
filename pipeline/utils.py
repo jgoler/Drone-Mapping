@@ -3,6 +3,7 @@ Utility functions
 """
 
 import os
+import yaml
 
 
 def safe_open(path, error_msg=None):
@@ -16,9 +17,11 @@ def safe_open(path, error_msg=None):
             raise Warning(f"File cannot be opened: {path}")
         return ""
 
+
 def read_input_paths():
     """
     Reads input paths from input_paths/repo.txt and input_paths/video_paths.txt
+    *** Not using this function anymore ***
     """
 
     ret = dict()
@@ -38,6 +41,15 @@ def read_input_paths():
     ret["percentages"] = PERCENTAGES
 
     return ret
+
+
+def get_config():
+    """
+    Load config.yaml, which contains all the relevant file paths
+    """
+    with open("config.yaml", "r") as file:
+        config = yaml.safe_load(file)
+    return config
 
 
 def get_immediate_subdirectories(path):
