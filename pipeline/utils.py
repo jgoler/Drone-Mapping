@@ -10,7 +10,7 @@ def safe_open(path, error_msg=None):
     try:
         with open(path, "r") as f:
             return f.read()
-    except:
+    except Exception:
         if error_msg is not None:
             raise ValueError(f"File cannot be opened: {path}\nError message: {error_msg}")
         else:
@@ -25,10 +25,13 @@ def read_input_paths():
     """
 
     ret = dict()
-    REPO_PATH = safe_open("input_paths/repo.txt", error_msg="Repo path not found. Set repo path in input_paths/repo.txt")
+    REPO_PATH = safe_open(
+        "input_paths/repo.txt",
+        error_msg="Repo path not found. Set repo path in input_paths/repo.txt",
+    )
     REPO_PATH = REPO_PATH.strip()
     if not os.path.exists(REPO_PATH):
-        raise ValueError("\'{REPO_PATH}\' is not a valid path. Set repo path in input_paths/repo.txt")
+        raise ValueError("'{REPO_PATH}' is not a valid path. Set repo path in input_paths/repo.txt")
     ret["repo"] = REPO_PATH
 
     VIDEO_PATHS = safe_open("input_paths/videos.txt")

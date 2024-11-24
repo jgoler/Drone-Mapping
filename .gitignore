@@ -2,6 +2,7 @@
 __pycache__/
 input_paths/
 data/
+output/
 *.jpg
 *.png
 *.mp4
