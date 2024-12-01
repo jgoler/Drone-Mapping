@@ -27,6 +27,14 @@ def main():
     percentages = config["percentages"]  # what percent of frames to select
     algorithms = config["algorithms"]
 
+    # write repo_path to txt because we will need it in future bash scripts
+    with open("repo.txt", "w") as f:
+        f.write(repo_path)
+
+    # Error-checking
+    if repo_path == "":
+        raise ValueError("Repo path not found. Set repo path in config.yaml")
+
     # extract frames and select keyframes
     FRAMES_FOLDER = os.path.join(repo_path, "data", "frames")
     KF_FOLDER = os.path.join(repo_path, "data", "keyframes")
@@ -46,9 +54,9 @@ def main():
             for algorithm in algorithms:
                 frame_folder_path = os.path.join(FRAMES_FOLDER, vid_frame_folder)
                 video_name = os.path.basename(vid_frame_folder)
-                kf_folder_path = os.path.join(KF_FOLDER, video_name, f"{percent}p_{algorithm}")
+                kf_folder_path = os.path.join(KF_FOLDER, video_name, f"{int(percent)}p_{algorithm}")
                 processed_folder_path = os.path.join(
-                    repo_path, "data", "processed", video_name, f"{percent}p_{algorithm}"
+                    repo_path, "data", "processed", video_name, f"{int(percent)}p_{algorithm}"
                 )
                 # check if keyframes already selected (i.e. kf folder already exists)
                 if os.path.exists(kf_folder_path):

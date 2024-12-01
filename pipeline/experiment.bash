@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Change to the directory of this script. Subsequent scripts run relative to this directory.
+cd "$(dirname "$0")"
+
 # Collect keyframes using python script
 ./experiment_pipeline.py
 
