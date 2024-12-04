@@ -3,9 +3,11 @@
 # Usage: ./ns_pipeline.bash $kf_folder
 
 # get keyframe input folder, repo path, and output folder
-kf_folder = $1
-read -r repo_path < "./input_paths/repo.txt"
-out_path = "${repo_path}/output"
+kf_folder=$1
+read -r repo_path < "./repo.txt"
+echo -e "\n*** Repo path: ${repo_path}"
+echo "*** Keyframe folder: ${kf_folder}"
+out_path="${repo_path}/output"
 
 # Get video name and percentage/algorithm from keyframe folder path
 if [[ $kf_folder =~ \/data\/keyframes\/([^\/]+)/([^\/]+)$ ]]; then
@@ -20,7 +22,7 @@ else
 fi
 
 # process to get camera poses with colmap
-ns-process-data --data $kf_folder --output_dir $train_folder
+ns-process-data images --data $kf_folder --output_dir $train_folder
 
 # run nerfstudio
 CURRENT_DATE_TIME='$(date "+%Y-%m-%d_%H-%M-%S")'

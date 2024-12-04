@@ -22,10 +22,12 @@ def select_keyframes(input_folder, output_folder, percentage, algorithm=""):
     if algorithm == "n":
         # select evenly spaced frames
         frame_indices = np.linspace(0, len(frames) - 1, num_frames, dtype=int)
-    else:
+    elif algorithm == "r":
         # select a random fraction of frames, but keep them in their original order
         frame_indices = np.random.choice(len(frames), size=num_frames, replace=False)
         frame_indices.sort()
+    else:
+        return
     selected_frames = [frames[i] for i in frame_indices]
 
     # create the output folder if it doesn't exist

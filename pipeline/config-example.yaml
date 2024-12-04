@@ -1,0 +1,35 @@
+---
+# This is an example config file with the format I'm using
+# Remember to rename to config.yaml!
+#
+# Variables
+# repo: ABSOLUTE path to your repo
+# videos: path each video (use absolute path!)
+# percentages: target percentages of frames to extract
+# algorithms: frame selection methods to use
+#   - "r" means random
+#   - "n" means every n frames (uniform selection)
+#   - "k" means using katna
+# DATA: path to data folder relative to repo folder (DO NOT CHANGE)
+# FRAMES: path to frames folder relative to repo (DO NOT CHANGE)
+# KF: path to keyframes folder relative to repo (DO NOT CHANGE)
+# PROCESSED: path to data processed by colmap (DO NOT CHANGE)
+
+repo: ""  # replace with path to your repo
+videos: [
+  # replace with path to your videos
+]
+percentages: [
+  10.0,
+  20.0,
+  50.0,
+]
+algorithms: [
+  "r",
+  "n",
+  "k"
+]
+DATA: "/data"
+FRAMES: "/data/frames"
+KF: "/data/keyframes"
+PROCESSED: "/data/processed"

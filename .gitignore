@@ -2,7 +2,10 @@
 __pycache__/
 input_paths/
 data/
+output/
+renders/
 *.jpg
 *.png
 *.mp4
 *.txt
+config.yaml
