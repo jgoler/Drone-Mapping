@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# Change to the directory of this script. Subsequent scripts run relative to this directory.
+# Change to the directory of this script. Subsequent scripts run relative to this directory. This does not work with source command
 cd "$(dirname "$0")"
+
+# Export config variables from yaml to bash
+./export_to_bash.py
 
 # Collect keyframes using python script
 ./experiment_pipeline.py
@@ -17,3 +20,8 @@ for kf_folder in "${kf_folders_array[@]}"; do
     # wait for the training to finish before starting the next one
     wait $pid
 done
+
+# # render ground truth images
+# ./ns_render_gt.bash
+
+

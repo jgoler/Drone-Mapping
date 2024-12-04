@@ -5,7 +5,7 @@
 # get keyframe input folder, repo path, and output folder
 kf_folder=$1
 read -r repo_path < "./repo.txt"
-echo "\n*** Repo path: ${repo_path}"
+echo -e "\n*** Repo path: ${repo_path}"
 echo "*** Keyframe folder: ${kf_folder}"
 out_path="${repo_path}/output"
 
