@@ -24,16 +24,5 @@ for kf_folder in "${kf_folders_array[@]}"; do
     wait $pid
 done
 
-# # render ground truth images
-# ./ns_render_gt.bash
-
-# # render nerf results and evaluate
-# declare -a out_folders_array
-# mapfile -t out_folders_array < ./out_folders.txt
-# for out_folder in "${out_folders_array[@]}"; do
-#     ./ns_eval_pipeline.bash $out_folder &
-#     pid=$!
-#     echo "Started NS render for ${out_folder}. Process ID: ${pid}"
-#     # wait for the rendering to finish before starting the next one
-#     wait $pid
-# done
+# Render and Evaluate
+./render_eval_script.bash

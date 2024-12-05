@@ -1,13 +1,38 @@
 #!/bin/bash
 
+# Change to the directory of this script. Note that below command does not work if run using source command
 cd "$(dirname "$0")"
+echo -n "Current working directory: "
+pwd
+
+# Load configs and source the config file to import variables. Source utils.bash to use the utility functions
+./export_to_bash.py
 source ./config.bash
+source ./utils.bash
 
-model_yml="/home/navlab/NeRF/nerfstudio/outputs/JackLakeLag/CombinedVideo/Nerfacto100Percent/nerfacto/2024-08-27_014642/config.yml"
-model_renders="${repo}/renders/JackLakeLag/ground_truth"
-camera_path="/home/navlab/NeRF/nerfstudio/data/JackLakeLag/CombinedVideo/Presentation-Render-2024-08-27_14-49.json"
+# Get renders of ground truth models
+gt_nerf_yml=$(find_latest_config "$gt_nerf_dir")
+gt_nerf_renders=$(get_render_dir_from_search_dir "$gt_nerf_dir")
+gt_splat_yml=$(find_latest_config "$gt_splat_dir")
+gt_splat_renders=$(get_render_dir_from_search_dir "$gt_splat_dir")
+echo "********** NeRF ground truth **********"
+echo "100p NeRF model yml: $gt_nerf_yml"
+echo "100p NeRF renders: $gt_nerf_renders"
+echo "*******************************************"
+echo "********** Splat ground truth **********"
+echo "100p Splat model yml: $gt_splat_yml"
+echo "100p Splat renders: $gt_splat_renders"
+echo "*******************************************"
 
-mkdir -p $model_renders
-ns-render camera-path --load-config $gt_model_yml --camera-path-filename $camera_path --output-path $gt_renders --output-format images
-
-
+# Perform evaluations
+for render_dir in "${render_dirs[@]}"; do
+    model_result_file=$(get_result_file_from_render_dir "$render_dir")
+    echo "********** Evaluating model **********"
+    # # Create directory for model_result_file if it doesn't exist
+    # mkdir -p "$(dirname "$model_result_file")"
+    if [ model_type == "nerfacto" ]; then
+        ./eval_pipeline.py $render_dir $gt_nerf_renders $model_result_file
+    else
+        ./eval_pipeline.py $render_dir $gt_splat_renders $model_result_file
+    fi
+done
