@@ -13,7 +13,7 @@ def calculate_psnr(pred, gt):
 
 
 def calculate_ssim(pred, gt):
-    return ssim(pred, gt, multichannel=True, data_range=1.0)
+    return ssim(pred, gt, multichannel=True, channel_axis=2, data_range=1.0)
 
 
 # Initialize the LPIPS model

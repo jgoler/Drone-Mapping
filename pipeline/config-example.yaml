@@ -1,6 +1,5 @@
 ---
-# This is an example config file with the format I'm using
-# Remember to rename to config.yaml!
+# config.yaml
 #
 # Variables
 # repo: ABSOLUTE path to your repo
@@ -15,21 +14,39 @@
 # KF: path to keyframes folder relative to repo (DO NOT CHANGE)
 # PROCESSED: path to data processed by colmap (DO NOT CHANGE)
 
-repo: ""  # replace with path to your repo
+repo: "/home/navlab/NeRF/drone_mapping/Drone-Mapping"  # replace with path to your repo
 videos: [
   # replace with path to your videos
+  # /home/navlab/NeRF/drone_mapping/lake_lag_sample.mp4
 ]
 percentages: [
   10.0,
   20.0,
   50.0,
+  100.0,
 ]
 algorithms: [
   "r",
-  "n",
-  "k"
+  "n"
+  #"k"
+]
+kf_folders_array: [
+  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/data/frames/pepperwood_preserve",
+  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/data/keyframes/pepperwood_preserve/3p_ffmpeg",
+  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/data/keyframes/pepperwood_preserve/3p_katna"
+]
+gt_model_dir: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/100p/pepperwood_preserve/nerfacto"
+model_dirs: [
+  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/3p_ffmpeg/pepperwood_preserve/nerfacto",
+  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/3p_katna/pepperwood_preserve/nerfacto",
+  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/3p_open_source/pepperwood_preserve/nerfacto",
+  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/3p_ffmpeg/pepperwood_preserve/splatfacto",
+  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/3p_katna/pepperwood_preserve/splatfacto",
+  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/3p_open_source/pepperwood_preserve/splatfacto",
 ]
 DATA: "/data"
 FRAMES: "/data/frames"
 KF: "/data/keyframes"
 PROCESSED: "/data/processed"
+RENDERS: "/renders"
+RESULTS: "/results"

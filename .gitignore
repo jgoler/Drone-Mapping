@@ -9,3 +9,4 @@ renders/
 *.mp4
 *.txt
 config.yaml
+config.bash
