@@ -6,7 +6,9 @@ Pipeline for evaluating NeRF / Gaussian Splat renders using PSNR, SSIM, and LPIP
 import numpy as np
 import os
 import argparse
-from eval_metrics import calculate_ssim
+
+# from eval_metrics import calculate_ssim
+from skimage.metrics import structural_similarity as ssim
 from skimage.io import imread
 
 
@@ -59,7 +61,12 @@ def main():
 
     print("Calculating SSIM scores...")
     # Vectorized SSIM calculation
-    ssim_scores = np.array([calculate_ssim(pred, gt) for pred, gt in zip(pred_images, gt_images)])
+    ssim_scores = np.array(
+        [
+            ssim(pred, gt, channel_axis=-1, data_range=1.0)
+            for pred, gt in zip(pred_images, gt_images)
+        ]
+    )
 
     print("We'll skip LPIPS calculation for now.")
     # Batch LPIPS calculation
