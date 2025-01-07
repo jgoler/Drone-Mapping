@@ -28,9 +28,9 @@ else
 fi
 
 # process to get camera poses with colmap
-ns-process-data images --data $kf_folder --output_dir $train_folder
+ns-process-data images --data $kf_folder --output_dir $train_folder --matching-method sequential
 
 # run nerfstudio
 CURRENT_DATE_TIME='$(date "+%Y-%m-%d_%H-%M-%S")'
-ns-train nerfacto --data $train_folder --output_dir $out_folder --vis wandb --experiment_name ${video_name}
-ns-train splatfacto --data $train_folder --output_dir $out_folder --vis wandb --experiment_name ${video_name}
+ns-train nerfacto --data $train_folder --output_dir $out_folder --vis wandb --experiment_name "${percentage}_${video_name}"
+ns-train splatfacto --data $train_folder --output_dir $out_folder --vis wandb --experiment_name "${percentage}_${video_name}"

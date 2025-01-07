@@ -9,6 +9,8 @@
 #   - "r" means random
 #   - "n" means every n frames (uniform selection)
 #   - "k" means using katna
+# model_dirs: directories of models to render
+# render_dirs: directories of existing renders to evaluate
 # DATA: path to data folder relative to repo folder (DO NOT CHANGE)
 # FRAMES: path to frames folder relative to repo (DO NOT CHANGE)
 # KF: path to keyframes folder relative to repo (DO NOT CHANGE)
@@ -31,18 +33,15 @@ algorithms: [
   #"k"
 ]
 kf_folders_array: [
-  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/data/frames/pepperwood_preserve",
-  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/data/keyframes/pepperwood_preserve/3p_ffmpeg",
-  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/data/keyframes/pepperwood_preserve/3p_katna"
 ]
-gt_model_dir: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/100p/pepperwood_preserve/nerfacto"
+camera_path: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/data/processed/pepperwood_preserve/100p/camera_paths/2024-12-04-20-33-57.json"
+gt_nerf_dir: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/100p/pepperwood_preserve/nerfacto"
+gt_splat_dir: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/100p/pepperwood_preserve/splatfacto"
 model_dirs: [
-  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/3p_ffmpeg/pepperwood_preserve/nerfacto",
-  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/3p_katna/pepperwood_preserve/nerfacto",
-  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/3p_open_source/pepperwood_preserve/nerfacto",
-  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/3p_ffmpeg/pepperwood_preserve/splatfacto",
-  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/3p_katna/pepperwood_preserve/splatfacto",
-  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/3p_open_source/pepperwood_preserve/splatfacto",
+  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/10p_open_source/pepperwood_preserve/nerfacto",
+]
+render_dirs: [
+
 ]
 DATA: "/data"
 FRAMES: "/data/frames"
