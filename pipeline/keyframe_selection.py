@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
+OLD CODE. NOT USED IN THE FINAL PIPELINE
+
 Code for selecting keyframes from a video
 """
-
 
 import os
 import numpy as np
@@ -10,7 +11,11 @@ import numpy as np
 
 def select_keyframes(input_folder, output_folder, percentage, algorithm=""):
     # get list of all frames in order
-    frames = [os.path.join(input_folder, f) for f in os.listdir(input_folder) if f.endswith(".jpg") or f.endswith(".png")]
+    frames = [
+        os.path.join(input_folder, f)
+        for f in os.listdir(input_folder)
+        if f.endswith(".jpg") or f.endswith(".png")
+    ]
     try:
         frames.sort(key=lambda f: int(os.path.basename(f).split("_")[1].split(".")[0]))
     except:
@@ -39,6 +44,6 @@ def select_keyframes(input_folder, output_folder, percentage, algorithm=""):
         filename = os.path.basename(frame)
         output_filename = os.path.join(output_folder, filename)
         os.system(f"cp {frame} {output_filename}")
-    
+
     # return the indices of the selected frames for the future when we analyze different algorithms
     return frame_indices

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+OLD CODE. NOT USED IN THE FINAL PIPELINE
+
 Python code for keyframe extraction
 
 Extracts frames from a video file and saves them as image files in a specified folder.

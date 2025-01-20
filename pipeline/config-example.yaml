@@ -1,51 +1,48 @@
 ---
 # config.yaml
+# 
+# Config info for pipeline that takes selected keyframes and train + evaluate models
 #
 # Variables
 # repo: ABSOLUTE path to your repo
-# videos: path each video (use absolute path!)
-# percentages: target percentages of frames to extract
-# algorithms: frame selection methods to use
-#   - "r" means random
-#   - "n" means every n frames (uniform selection)
-#   - "k" means using katna
+# camera_path
+# gt_nerf_dir
+# gt_splat_dir
+# org_transforms: transform files with all of the frames
 # model_dirs: directories of models to render
 # render_dirs: directories of existing renders to evaluate
-# DATA: path to data folder relative to repo folder (DO NOT CHANGE)
-# FRAMES: path to frames folder relative to repo (DO NOT CHANGE)
-# KF: path to keyframes folder relative to repo (DO NOT CHANGE)
-# PROCESSED: path to data processed by colmap (DO NOT CHANGE)
+# DATA: path to data folder
+# PROCESSED: path to data processed by colmap
+# RENDERS
+# RESULTS
 
 repo: "/home/navlab/NeRF/drone_mapping/Drone-Mapping"  # replace with path to your repo
-videos: [
-  # replace with path to your videos
-  # /home/navlab/NeRF/drone_mapping/lake_lag_sample.mp4
-]
-percentages: [
-  10.0,
-  20.0,
-  50.0,
-  100.0,
-]
-algorithms: [
-  "r",
-  "n"
-  #"k"
-]
-kf_folders_array: [
-]
+# videos: [
+#   # replace with path to your videos
+#   # /home/navlab/NeRF/drone_mapping/lake_lag_sample.mp4
+# ]
+# percentages: [
+#   10.0,
+#   20.0,
+#   50.0,
+#   100.0,
+# ]
+# algorithms: [
+#   "r",
+#   "n"
+#   #"k"
+# ]
+# kf_folders_array: [
+# ]
 camera_path: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/data/processed/pepperwood_preserve/100p/camera_paths/2024-12-04-20-33-57.json"
 gt_nerf_dir: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/100p/pepperwood_preserve/nerfacto"
 gt_splat_dir: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/100p/pepperwood_preserve/splatfacto"
+org_transforms: "/home/navlab/NeRF/drone_mapping/data/processed/pepperwood_preserve/gt_transforms.json"
 model_dirs: [
-  "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/10p_open_source/pepperwood_preserve/nerfacto",
 ]
 render_dirs: [
-
 ]
-DATA: "/data"
-FRAMES: "/data/frames"
-KF: "/data/keyframes"
-PROCESSED: "/data/processed"
+DATA: "/home/navlab/NeRF/drone_mapping/data/frames"
+PROCESSED: "/home/navlab/NeRF/drone_mapping/data/processed"
 RENDERS: "/renders"
 RESULTS: "/results"

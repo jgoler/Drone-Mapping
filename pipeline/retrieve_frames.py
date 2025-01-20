@@ -5,9 +5,15 @@ Given frame numbers selected as keyframes, retrieve frames from the processed da
 import json
 import os
 import shutil
+from datetime import datetime
+from utils import get_config
 
 
-def extract_frames(original_json_path, selected_frame_numbers, output_json_path):
+def get_frames_data(original_json_path, selected_frame_numbers):
+    """
+    Extracts the frames with the selected frame numbers from the original transforms.json file and returns the new data
+    as a dictionary. The new data can be written to a new file using the output_json_path.
+    """
     # Read the original transforms.json file
     with open(original_json_path, "r") as f:
         data = json.load(f)
@@ -27,7 +33,23 @@ def extract_frames(original_json_path, selected_frame_numbers, output_json_path)
     new_data = {key: value for key, value in data.items() if key != "frames"}
     new_data["frames"] = selected_frames
 
-    # Write the new transforms.json file
+    return new_data
+
+
+def create_output_json(new_data, output_json_folder):
+    # Make sure the output_json_folder exists and is a directory
+    assert os.path.isdir(output_json_folder), (
+        f"Output folder {output_json_folder} does not exist or is not a directory."
+    )
+
+    # Check if there is an existing transforms.json file in the output_json_folder. Rename it if so.
+    output_json_path = os.path.join(output_json_folder, "transforms.json")
+    if os.path.exists(output_json_path):
+        current_date_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+        new_name = f"transforms_{current_date_time}.json"
+        os.rename(output_json_path, os.path.join(os.path.dirname(output_json_path), new_name))
+
+    # Write the new data to the output_json_path
     with open(output_json_path, "w") as f:
         json.dump(new_data, f, indent=4)
 
@@ -51,14 +73,10 @@ def copy_selected_images(original_images_folder, selected_frame_numbers, destina
 
 if __name__ == "__main__":
     # Example usage
-    original_json_path = "/home/navlab/NeRF/drone_mapping/Drone-Mapping/data/processed/pepperwood_preserve/100p/transforms.json"
-    selected_frame_numbers = [5 * i for i in range(100)]  # List of frame numbers to extract
-    output_json_path = "/home/navlab/NeRF/drone_mapping/test_folder/colmap_sample/transforms.json"
+    config = get_config()
+    original_json_path = config["org_transforms"]
+    selected_frame_numbers = [20 * i for i in range(1, 191)]  # List of frame numbers to extract
+    output_json_folder = config["PROCESSED"]
 
-    skip_json = True  # Set to True if you only want to copy the images and not modify the json file
-    if not skip_json:
-        extract_frames(original_json_path, selected_frame_numbers, output_json_path)
-
-    original_images_folder = "/home/navlab/NeRF/drone_mapping/Drone-Mapping/data/processed/pepperwood_preserve/100p/images"
-    destination_folder = "/home/navlab/NeRF/drone_mapping/test_folder/colmap_sample/images"
-    copy_selected_images(original_images_folder, selected_frame_numbers, destination_folder)
+    new_data = get_frames_data(original_json_path, selected_frame_numbers)
+    create_output_json(new_data, output_json_folder)
