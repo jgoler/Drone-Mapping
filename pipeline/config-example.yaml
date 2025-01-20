@@ -37,7 +37,7 @@ repo: "/home/navlab/NeRF/drone_mapping/Drone-Mapping"  # replace with path to yo
 camera_path: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/data/processed/pepperwood_preserve/100p/camera_paths/2024-12-04-20-33-57.json"
 gt_nerf_dir: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/100p/pepperwood_preserve/nerfacto"
 gt_splat_dir: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/100p/pepperwood_preserve/splatfacto"
-org_transforms: "/home/navlab/NeRF/drone_mapping/data/processed/pepperwood_preserve/gt_transforms.json"
+full_transforms: "/home/navlab/NeRF/drone_mapping/data/processed/pepperwood_preserve/full_transforms.json"
 model_dirs: [
 ]
 render_dirs: [

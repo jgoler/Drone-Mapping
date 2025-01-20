@@ -7,6 +7,7 @@ import os
 import shutil
 from datetime import datetime
 from utils import get_config
+import argparse
 
 
 def get_frames_data(original_json_path, selected_frame_numbers):
@@ -36,19 +37,13 @@ def get_frames_data(original_json_path, selected_frame_numbers):
     return new_data
 
 
-def create_output_json(new_data, output_json_folder):
-    # Make sure the output_json_folder exists and is a directory
-    assert os.path.isdir(output_json_folder), (
-        f"Output folder {output_json_folder} does not exist or is not a directory."
-    )
-
-    # Check if there is an existing transforms.json file in the output_json_folder. Rename it if so.
-    output_json_path = os.path.join(output_json_folder, "transforms.json")
+def create_output_json(new_data, output_json_path):
+    folder = os.path.dirname(output_json_path)
+    assert os.path.exists(folder), f"Output folder '{folder}' d.n.e., plz create it."
+    # Avoid overwriting existing files
     if os.path.exists(output_json_path):
-        current_date_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-        new_name = f"transforms_{current_date_time}.json"
-        os.rename(output_json_path, os.path.join(os.path.dirname(output_json_path), new_name))
-
+        print(f"Warning: {output_json_path} already exists. Exiting to prevent overwriting.")
+        return
     # Write the new data to the output_json_path
     with open(output_json_path, "w") as f:
         json.dump(new_data, f, indent=4)
@@ -71,12 +66,20 @@ def copy_selected_images(original_images_folder, selected_frame_numbers, destina
             print(f"Warning: {src_file} does not exist and will not be copied.")
 
 
-if __name__ == "__main__":
-    # Example usage
+def main():
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description="Write info of selected frames to json.")
+    parser.add_argument("output_json_path", type=str, help="Path to the model renders folder")
+    args = parser.parse_args()
+
     config = get_config()
-    original_json_path = config["org_transforms"]
+    original_json_path = config["full_transforms"]
     selected_frame_numbers = [20 * i for i in range(1, 191)]  # List of frame numbers to extract
-    output_json_folder = config["PROCESSED"]
+    output_json_path = args.output_json_path
 
     new_data = get_frames_data(original_json_path, selected_frame_numbers)
-    create_output_json(new_data, output_json_folder)
+    create_output_json(new_data, output_json_path)
+
+
+if __name__ == "__main__":
+    main()
