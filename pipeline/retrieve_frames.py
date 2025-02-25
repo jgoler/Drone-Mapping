@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Given frame numbers selected as keyframes, retrieve frames from the processed data folder created by Colmap.
 """
@@ -67,15 +68,15 @@ def copy_selected_images(original_images_folder, selected_frame_numbers, destina
 
 
 def main():
-    # Parse command-line arguments
-    parser = argparse.ArgumentParser(description="Write info of selected frames to json.")
-    parser.add_argument("output_json_path", type=str, help="Path to the model renders folder")
-    args = parser.parse_args()
+    # # Parse command-line arguments
+    # parser = argparse.ArgumentParser(description="Write info of selected frames to json.")
+    # parser.add_argument("output_json_path", type=str, help="Path to processed data folder")
+    # args = parser.parse_args()
 
     config = get_config()
     original_json_path = config["full_transforms"]
-    selected_frame_numbers = [20 * i for i in range(1, 191)]  # List of frame numbers to extract
-    output_json_path = args.output_json_path
+    selected_frame_numbers = [i for i in range(1, 741)]  # List of frame numbers to extract
+    output_json_path = os.path.join(config["processed"], "transforms.json")
 
     new_data = get_frames_data(original_json_path, selected_frame_numbers)
     create_output_json(new_data, output_json_path)
