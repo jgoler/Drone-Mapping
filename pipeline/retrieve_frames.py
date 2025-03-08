@@ -41,11 +41,8 @@ def get_frames_data(original_json_path, selected_frame_numbers):
 def create_output_json(new_data, output_json_path):
     folder = os.path.dirname(output_json_path)
     assert os.path.exists(folder), f"Output folder '{folder}' d.n.e., plz create it."
-    # Avoid overwriting existing files
-    if os.path.exists(output_json_path):
-        print(f"Warning: {output_json_path} already exists. Exiting to prevent overwriting.")
-        return
-    # Write the new data to the output_json_path
+
+    # Write the new data to the output_json_path. Will overwrite existing file.
     with open(output_json_path, "w") as f:
         json.dump(new_data, f, indent=4)
 
