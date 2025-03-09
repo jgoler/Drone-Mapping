@@ -6,7 +6,6 @@ Given frame numbers selected as keyframes, retrieve frames from the processed da
 import json
 import os
 import shutil
-from datetime import datetime
 from utils import get_config
 import argparse
 
@@ -65,19 +64,33 @@ def copy_selected_images(original_images_folder, selected_frame_numbers, destina
 
 
 def main():
-    # # Parse command-line arguments
-    # parser = argparse.ArgumentParser(description="Write info of selected frames to json.")
-    # parser.add_argument("output_json_path", type=str, help="Path to processed data folder")
-    # args = parser.parse_args()
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description="Write info of selected frames to json.")
+    parser.add_argument("experiment_name", type=str, help="Name of the experiment")
+    args = parser.parse_args()
 
+    # Load config.yaml variables
     config = get_config()
-    original_json_path = config["full_transforms"]
-    selected_frame_numbers = [i for i in range(1, 741)]  # List of frame numbers to extract
-    output_json_path = os.path.join(config["processed"], "transforms.json")
+
+    # Get the keyframe numbers for the experiment
+    kf_num_filename = config["kf_num_files"].get(args.experiment_name)
+
+    with open(os.path.join(config["proj_dir"], config["kf_nums_dir"], kf_num_filename), "r") as f:
+        selected_frame_numbers = [int(line.strip()) for line in f]
+
+    # Get the paths for the input and output files
+    original_json_path = os.path.join(config["proj_dir"], config["full_transforms"])
+    output_json_path = os.path.join(config["proj_dir"], config["processed"], "transforms.json")
 
     new_data = get_frames_data(original_json_path, selected_frame_numbers)
     create_output_json(new_data, output_json_path)
+    print("Selected frames info written to", output_json_path)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {e}")
+        exit(1)
+    exit(0)

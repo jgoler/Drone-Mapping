@@ -77,6 +77,9 @@ def create_camera_path(org_json_path, selected_frame_numbers, w_to_rf_path, outp
         frame_info["camera_to_world"] = T_c_rf.flatten().tolist()
         frame_info["fov"] = camera_path["default_fov"]
         frame_info["aspect"] = aspect
+        frame_info["frame_num"] = int(
+            frame["file_path"].split("/")[-1].split(".")[0].split("_")[-1]
+        )
         camera_path["camera_path"].append(frame_info)
 
     # Ensure the output folder exists
@@ -95,7 +98,7 @@ def create_camera_path(org_json_path, selected_frame_numbers, w_to_rf_path, outp
 if __name__ == "__main__":
     config = get_config()
     selected_frame_numbers = [i for i in range(741, 973)]
-    org_json_path = config["full_transforms"]
+    org_json_path = os.path.join(config["proj_dir"], config["full_transforms"])
     output_json_path = (
         "/home/navlab/NeRF/drone_mapping/data/lake_lag/processed/camera_paths/sample_eval_path.json"
     )
