@@ -2,47 +2,32 @@
 # config.yaml
 # 
 # Config info for pipeline that takes selected keyframes and train + evaluate models
+# All paths are relative to the project directory
 #
 # Variables
-# repo: ABSOLUTE path to your repo
-# camera_path
-# gt_nerf_dir
-# gt_splat_dir
-# org_transforms: transform files with all of the frames
-# model_dirs: directories of models to render
-# render_dirs: directories of existing renders to evaluate
-# DATA: path to data folder
-# PROCESSED: path to data processed by colmap
-# RENDERS
-# RESULTS
+# camera_path: path to the camera paths for evaluation
+# eval_images: path to the eval_image dataset
+# experiments: list of experiment names. Nerf experiments should end w/ nerf and Gsplats end w/ splat
+# full_transforms: path to the complete set of colmap transforms for both the eval and training images
+# kf_num_files: dictionary mapping each experiment (name) to the corresponding txt file with keyframe numbers
+# models: name of models directory
+# processed: name of directories containing the processed data
+# proj_dir: absolute path of the project. All other paths here should be relative to this path
+# renders: path to the renders directory
+# repo: path to the github repository
+# results: path to the directory with results
 
-repo: "/home/navlab/NeRF/drone_mapping/Drone-Mapping"  # replace with path to your repo
-# videos: [
-#   # replace with path to your videos
-#   # /home/navlab/NeRF/drone_mapping/lake_lag_sample.mp4
-# ]
-# percentages: [
-#   10.0,
-#   20.0,
-#   50.0,
-#   100.0,
-# ]
-# algorithms: [
-#   "r",
-#   "n"
-#   #"k"
-# ]
-# kf_folders_array: [
-# ]
-camera_path: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/data/processed/pepperwood_preserve/100p/camera_paths/2024-12-04-20-33-57.json"
-gt_nerf_dir: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/100p/pepperwood_preserve/nerfacto"
-gt_splat_dir: "/home/navlab/NeRF/drone_mapping/Drone-Mapping/output/pepperwood_preserve/100p/pepperwood_preserve/splatfacto"
-full_transforms: "/home/navlab/NeRF/drone_mapping/data/processed/pepperwood_preserve/full_transforms.json"
-model_dirs: [
-]
-render_dirs: [
-]
-DATA: "/home/navlab/NeRF/drone_mapping/data/frames"
-PROCESSED: "/home/navlab/NeRF/drone_mapping/data/processed"
-RENDERS: "/renders"
-RESULTS: "/results"
+camera_path: Drone-Mapping/transforms/camera_paths/eval_path.json
+eval_images: data/lake_lag/processed/eval
+experiments:
+  - 70p_content_nerf
+full_transforms: Drone-Mapping/transforms/lake_lag/full_transforms.json
+kf_num_files:
+  10p_uniform_test3_nerf: 10p_uniform.txt
+kf_nums_dir: Drone-Mapping/pipeline/kf_nums/
+models: models/
+processed: data/lake_lag/tmp_test_data/
+proj_dir: /home/navlab/NeRF/drone_mapping/
+renders: renders/
+repo: Drone-Mapping/
+results: results/
