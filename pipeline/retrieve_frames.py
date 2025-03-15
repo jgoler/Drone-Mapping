@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Given frame numbers selected as keyframes, retrieve frames from the processed data folder created by Colmap.
 """
@@ -5,8 +6,8 @@ Given frame numbers selected as keyframes, retrieve frames from the processed da
 import json
 import os
 import shutil
-from datetime import datetime
 from utils import get_config
+import argparse
 
 
 def get_frames_data(original_json_path, selected_frame_numbers):
@@ -36,20 +37,11 @@ def get_frames_data(original_json_path, selected_frame_numbers):
     return new_data
 
 
-def create_output_json(new_data, output_json_folder):
-    # Make sure the output_json_folder exists and is a directory
-    assert os.path.isdir(output_json_folder), (
-        f"Output folder {output_json_folder} does not exist or is not a directory."
-    )
+def create_output_json(new_data, output_json_path):
+    folder = os.path.dirname(output_json_path)
+    assert os.path.exists(folder), f"Output folder '{folder}' d.n.e., plz create it."
 
-    # Check if there is an existing transforms.json file in the output_json_folder. Rename it if so.
-    output_json_path = os.path.join(output_json_folder, "transforms.json")
-    if os.path.exists(output_json_path):
-        current_date_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-        new_name = f"transforms_{current_date_time}.json"
-        os.rename(output_json_path, os.path.join(os.path.dirname(output_json_path), new_name))
-
-    # Write the new data to the output_json_path
+    # Write the new data to the output_json_path. Will overwrite existing file.
     with open(output_json_path, "w") as f:
         json.dump(new_data, f, indent=4)
 
@@ -71,12 +63,34 @@ def copy_selected_images(original_images_folder, selected_frame_numbers, destina
             print(f"Warning: {src_file} does not exist and will not be copied.")
 
 
-if __name__ == "__main__":
-    # Example usage
+def main():
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description="Write info of selected frames to json.")
+    parser.add_argument("experiment_name", type=str, help="Name of the experiment")
+    args = parser.parse_args()
+
+    # Load config.yaml variables
     config = get_config()
-    original_json_path = config["org_transforms"]
-    selected_frame_numbers = [20 * i for i in range(1, 191)]  # List of frame numbers to extract
-    output_json_folder = config["PROCESSED"]
+
+    # Get the keyframe numbers for the experiment
+    kf_num_filename = config["kf_num_files"].get(args.experiment_name)
+
+    with open(os.path.join(config["proj_dir"], config["kf_nums_dir"], kf_num_filename), "r") as f:
+        selected_frame_numbers = [int(line.strip()) for line in f]
+
+    # Get the paths for the input and output files
+    original_json_path = os.path.join(config["proj_dir"], config["full_transforms"])
+    output_json_path = os.path.join(config["proj_dir"], config["processed"], "transforms.json")
 
     new_data = get_frames_data(original_json_path, selected_frame_numbers)
-    create_output_json(new_data, output_json_folder)
+    create_output_json(new_data, output_json_path)
+    print("Selected frames info written to", output_json_path)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {e}")
+        exit(1)
+    exit(0)
