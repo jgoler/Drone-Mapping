@@ -45,10 +45,10 @@ else
     fi
     if [[ "$exp_name" = *"nerf"* ]]; then
         echo "Experiment name contains 'nerf'. Assuming nerf experiment."
-        ns-train nerfacto --data $train_dir --output_dir $model_dir --vis wandb --experiment_name $exp_name
+        ns-train nerfacto --data $train_dir --output_dir $model_dir --pipeline.datamanager.images-on-gpu True --vis wandb --experiment_name $exp_name --project_name drone_mapping
     elif [[ "$exp_name" = *"splat"* ]]; then
         echo "Experiment name contains 'splat'. Assuming splat experiment."
-        ns-train splatfacto --data $train_dir --output_dir $model_dir --vis wandb --experiment_name $exp_name
+        ns-train splatfacto --data $train_dir --output_dir $model_dir --pipeline.datamanager.cache-images "gpu" --pipeline.datamanager.images-on-gpu True --vis wandb --experiment_name $exp_name --project_name drone_mapping
     else
         echo "Experiment name must contain 'splat' or 'nerf'"
         exit 1
@@ -57,11 +57,12 @@ fi
 
 # Extract the model config and render the model
 model_config=$(find_latest_config "${model_dir}/${exp_name}")
+dataparser=$(./find_dataparser.py "${model_dir}/${exp_name}")
 ns-render camera-path --load-config $model_config --camera-path-filename $abs_camera_path --output-path $render_dir --output-format images
 
-# Evaluate the model
-./eval_pipeline.py $render_dir $result_file $exp_name
-if [ $? -ne 0 ]; then
-    echo "eval_pipeline.py failed for experiment ${exp_name}. Run the script manually to debug."
-    exit 1
-fi
+# # Evaluate the model
+# ./eval_pipeline.py $render_dir $result_file $exp_name
+# if [ $? -ne 0 ]; then
+#     echo "eval_pipeline.py failed for experiment ${exp_name}. Run the script manually to debug."
+#     exit 1
+# fi

@@ -10,3 +10,4 @@ renders/
 *.txt
 config.yaml
 config.bash
+plots/

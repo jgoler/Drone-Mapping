@@ -14,7 +14,8 @@ source ./config.bash
 
 # run nerfstudio on each keyframe folder
 for exp_name in "${experiments[@]}"; do
-    ./model_pipeline.bash $exp_name & 
+    # Set the second argument to 1 to skip training and only render
+    ./model_pipeline.bash $exp_name 1 & 
     pid=$!
     echo "Started pipeline for experiment ${exp_name}. Process ID: ${pid}"
     # wait for the training to finish before starting the next one

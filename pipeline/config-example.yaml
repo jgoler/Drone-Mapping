@@ -26,7 +26,7 @@ kf_num_files:
   10p_uniform_test3_nerf: 10p_uniform.txt
 kf_nums_dir: Drone-Mapping/pipeline/kf_nums/
 models: models/
-processed: data/lake_lag/tmp_test_data/
+processed: data/lake_lag/
 proj_dir: /home/navlab/NeRF/drone_mapping/
 renders: renders/
 repo: Drone-Mapping/

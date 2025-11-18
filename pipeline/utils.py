@@ -4,6 +4,7 @@ Utility functions
 
 import os
 import yaml
+import argparse
 
 
 def safe_open(path, error_msg=None):
@@ -70,3 +71,24 @@ def export_to_txt(array, path):
     with open(path, "w") as f:
         for item in array:
             f.write("%s\n" % item)
+
+
+def find_dataparser_transforms_file(search_dir):
+    """Find the dataparser_transforms.json file in the given model directory and experiment name."""
+
+    # Find the latest config file
+    dataparser_files = []
+    if not os.path.exists(search_dir):
+        return ""
+
+    for root, dirs, files in os.walk(search_dir):
+        if "dataparser_transforms.json" in files:
+            dataparser_files.append(os.path.join(root, "dataparser_transforms.json"))
+
+    if not dataparser_files:
+        return ""
+
+    # Use folder name to get the latest one
+    latest_file = max(dataparser_files, key=lambda x: os.path.basename(x))
+
+    return latest_file

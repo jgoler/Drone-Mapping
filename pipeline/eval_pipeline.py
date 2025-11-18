@@ -43,8 +43,8 @@ def calculate_lpips(pred, gt):
     loss_fn = lpips.LPIPS(net="alex")
 
     # Convert images to tensor and normalize to [-1, 1]
-    pred_tensor = (torch.tensor(pred).permute(2, 0, 1).unsqueeze(0) * 2) - 1
-    gt_tensor = (torch.tensor(gt).permute(2, 0, 1).unsqueeze(0) * 2) - 1
+    pred_tensor = (torch.tensor(pred, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0) * 2) - 1
+    gt_tensor = (torch.tensor(gt, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0) * 2) - 1
 
     # Calculate LPIPS score
     lpips_score = loss_fn(pred_tensor, gt_tensor).item()
