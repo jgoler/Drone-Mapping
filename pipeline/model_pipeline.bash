@@ -6,7 +6,6 @@ source ./utils.bash
 
 # Get input argument
 exp_name=$1
-skip_train=${2:-0}
 
 # Construct the folder paths from the config variables
 train_dir="${proj_dir}/${processed}"
@@ -30,9 +29,8 @@ elif [ -z "$exp_name" ]; then
     exit 1
 fi
 
-
-
-# Train the model
+# Train the model. Set skip_train=0 to enable training
+skip_train=0
 if [ "$skip_train" -ne 0 ]; then
     echo "Skipping training as per the skip_train flag."
 else
@@ -56,13 +54,34 @@ else
 fi
 
 # Extract the model config and render the model
-model_config=$(find_latest_config "${model_dir}/${exp_name}")
-dataparser=$(./find_dataparser.py "${model_dir}/${exp_name}")
-ns-render camera-path --load-config $model_config --camera-path-filename $abs_camera_path --output-path $render_dir --output-format images
+skip_render=0
+if [ "$skip_render" -ne 0 ]; then
+    echo "Skipping rendering as per the skip_render flag."
+else
+    model_config=$(find_latest_config "${model_dir}/${exp_name}")
+    dataparser=$(./find_dataparser.py "${model_dir}/${exp_name}")
+    if [ $? -ne 0 ]; then
+        echo "find_dataparser.py failed for experiment ${exp_name}. Run the script manually to debug."
+        exit 1
+    fi
+    abs_camera_path="${proj_dir}/${camera_path}/${exp_name}_camera_path.json"
+    ./camera_path.py $dataparser $abs_camera_path
+    if [ $? -ne 0 ]; then
+        echo "camera_path.py failed for experiment ${exp_name}. Run the script manually to debug."
+        exit 1
+    fi
+    ns-render camera-path --load-config $model_config --camera-path-filename $abs_camera_path --output-path $render_dir --output-format images
+fi
 
-# # Evaluate the model
-# ./eval_pipeline.py $render_dir $result_file $exp_name
-# if [ $? -ne 0 ]; then
-#     echo "eval_pipeline.py failed for experiment ${exp_name}. Run the script manually to debug."
-#     exit 1
-# fi
+# Evaluate the model
+skip_eval=0
+if [ "$skip_eval" -ne 0 ]; then
+    echo "Skipping evaluation as per the skip_eval flag."
+else
+    ./eval_pipeline.py $render_dir $result_file $exp_name
+    if [ $? -ne 0 ]; then
+        echo "eval_pipeline.py failed for experiment ${exp_name}. Run the script manually to debug."
+        exit 1
+    fi
+    echo "Evaluation completed successfully for experiment ${exp_name}."
+fi

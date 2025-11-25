@@ -10,10 +10,11 @@ from utils import get_config
 import traceback
 
 # Import metrics for calculations
-from skimage.metrics import structural_similarity as ssim
 from skimage.io import imread
 import lpips
+from pytorch_msssim import ssim
 import torch
+from concurrent.futures import ThreadPoolExecutor
 
 
 def load_images_from_folder(folder, frame_numbers=None):
@@ -38,18 +39,69 @@ def normalize_images(images):
     return images
 
 
-def calculate_lpips(pred, gt):
-    # Initialize LPIPS model
-    loss_fn = lpips.LPIPS(net="alex")
+# ---- Create LPIPS model on each GPU ----
+def create_models():
+    models = {}
+    for i in range(torch.cuda.device_count()):
+        device = torch.device(f"cuda:{i}")
+        model = lpips.LPIPS(net="alex").to(device)
+        model.eval()
+        models[i] = model
+    return models
 
-    # Convert images to tensor and normalize to [-1, 1]
-    pred_tensor = (torch.tensor(pred, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0) * 2) - 1
-    gt_tensor = (torch.tensor(gt, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0) * 2) - 1
 
-    # Calculate LPIPS score
-    lpips_score = loss_fn(pred_tensor, gt_tensor).item()
+MODELS = create_models()
 
-    return lpips_score
+
+# ---- LPIPS evaluate a chunk on a specific GPU ----
+@torch.no_grad()
+def eval_chunk_on_gpu(pred_chunk, gt_chunk, gpu_id, is_lpips):
+    device = torch.device(f"cuda:{gpu_id}")
+    model = MODELS[gpu_id]
+
+    pred = torch.tensor(pred_chunk).permute(0, 3, 1, 2).float()  # NHWC→NCHW
+    gt = torch.tensor(gt_chunk).permute(0, 3, 1, 2).float()
+
+    pred = pred * 2 - 1
+    gt = gt * 2 - 1
+
+    pred = pred.to(device, non_blocking=True)
+    gt = gt.to(device, non_blocking=True)
+
+    with torch.cuda.amp.autocast(dtype=torch.float16):  # type: ignore
+        if is_lpips:
+            scores = model(pred, gt).view(-1)
+        else:
+            # Assume metric is ssim then
+            scores = ssim(pred, gt, data_range=1.0, size_average=False).view(-1)
+
+    torch.cuda.empty_cache()
+    return scores.cpu()
+
+
+def parallel_eval(pred, gt, chunk_size=2, is_lpips=True):
+    futures = []
+    results = []
+
+    num_gpus = torch.cuda.device_count()
+    executor = ThreadPoolExecutor(max_workers=num_gpus)
+
+    i = 0
+    gpu_id = 0
+
+    while i < len(pred):
+        p = pred[i : i + chunk_size]
+        g = gt[i : i + chunk_size]
+
+        futures.append(executor.submit(eval_chunk_on_gpu, p, g, gpu_id, is_lpips))
+
+        gpu_id = (gpu_id + 1) % num_gpus
+        i += chunk_size
+
+    for f in futures:
+        results.append(f.result())
+
+    return torch.cat(results)
 
 
 def main():
@@ -91,19 +143,13 @@ def main():
     psnr_scores = 10 * np.log10(1.0 / mse)
 
     print("Calculating SSIM scores...")
-    # Vectorized SSIM calculation
-    ssim_scores = np.array(
-        [
-            ssim(pred, gt, channel_axis=-1, data_range=1.0)
-            for pred, gt in zip(pred_images, eval_images)
-        ]
-    )
+    # GPU accelerated SSIM calculation
+    ssim_scores = parallel_eval(pred_images, eval_images, chunk_size=4, is_lpips=False)
+    ssim_scores = ssim_scores.cpu().numpy()
 
     print("Calculating LPIPS scores...")
-    # Batch LPIPS calculation
-    lpips_scores = np.array(
-        [calculate_lpips(pred, gt) for pred, gt in zip(pred_images, eval_images)]
-    )
+    lpips_scores_tensor = parallel_eval(pred_images, eval_images, chunk_size=4, is_lpips=True)
+    lpips_scores = lpips_scores_tensor.cpu().numpy()
 
     data = np.vstack((psnr_scores, ssim_scores, lpips_scores)).T
 

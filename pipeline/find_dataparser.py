@@ -2,7 +2,6 @@
 
 from utils import find_dataparser_transforms_file
 import argparse
-import sys
 
 
 if __name__ == "__main__":

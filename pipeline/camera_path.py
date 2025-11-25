@@ -6,6 +6,8 @@ Create Camera Path json based on data in transforms.json file.
 import json
 import os
 import numpy as np
+import argparse
+
 from utils import get_config
 from retrieve_frames import get_frames_data
 
@@ -86,9 +88,9 @@ def create_camera_path(org_json_path, selected_frame_numbers, w_to_rf_path, outp
     assert os.path.exists(os.path.dirname(output_json_path)), (
         f"Output folder '{os.path.dirname(output_json_path)}' d.n.e., plz create it."
     )
-    # Warning overwriting existing files
-    if os.path.exists(output_json_path):
-        print(f"Warning: {output_json_path} already exists. Overwriting it.")
+    # # Warning overwriting existing files
+    # if os.path.exists(output_json_path):
+    #     print(f"Warning: {output_json_path} already exists. Overwriting it.")
 
     # Write the new data to the output_json_path
     with open(output_json_path, "w") as f:
@@ -96,14 +98,17 @@ def create_camera_path(org_json_path, selected_frame_numbers, w_to_rf_path, outp
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Find the dataparser transforms file.")
+    parser.add_argument("dataparser_path", type=str, help="Path to dataparser transforms file.")
+    parser.add_argument("output_path", type=str, help="Output path.")
+    args = parser.parse_args()
+
     config = get_config()
     selected_frame_numbers = [i for i in range(741, 973)]
     org_json_path = os.path.join(config["proj_dir"], config["full_transforms"])
-    output_json_path = (
-        "/home/navlab/NeRF/drone_mapping/data/lake_lag/processed/camera_paths/sample_eval_path.json"
-    )
+    output_json_path = args.output_path
     # This file (dataparser_transforms.json in model folder) converts colmap coordinates to NeRF coordinates
-    w_to_rf_path = "/home/navlab/NeRF/drone_mapping/10p_splatfacto_lake_lag/10p_splatfacto_lake_lag/splatfacto/2025-03-04_135710/dataparser_transforms.json"
+    w_to_rf_path = args.dataparser_path
 
     # Create the camera path and write it to json
     create_camera_path(org_json_path, selected_frame_numbers, w_to_rf_path, output_json_path)
