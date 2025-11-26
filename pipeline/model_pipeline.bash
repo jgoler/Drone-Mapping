@@ -32,17 +32,27 @@ elif [ -z "$exp_name" ]; then
     exit 1
 fi
 
-# Train the model. Set skip_train=0 when running experiment.bash to enable training
-if [ "$skip_train" -ne 0 ]; then
-    echo "Skipping training as per the skip_train flag."
-else
+if [ "$skip_train" -ne 0 ] || [ "$skip_render" -ne 0 ] || [ "$skip_eval" -ne 0 ]; then
+    echo "Skip flags - skip_train: $skip_train, skip_render: $skip_render, skip_eval: $skip_eval"
+fi
+
+if [ "$skip_train" -eq 0 ] || [ "$skip_render" -eq 0 ]; then
+    # Either training or rendering is not skipped
+    # As of nerfstudio v1.1.4, transforms file must match the one used during training for rendering
     # Create transforms file by calling retrieve_frames.py. This script will create a transforms file in the train_dir
     # Script exits if retrieve_frames.py fails
+    echo "Generating transforms file for experiment ${exp_name}..."
     ./retrieve_frames.py $exp_name
     if [ $? -ne 0 ]; then
         echo "retrieve_frames.py failed, exiting."
         exit 1
     fi
+fi
+
+# Train the model. Set skip_train=0 when running experiment.bash to enable training
+if [ "$skip_train" -ne 0 ]; then
+    echo "Skipping training as per the skip_train flag."
+else
     if [[ "$exp_name" = *"nerf"* ]]; then
         echo "Experiment name contains 'nerf'. Assuming nerf experiment."
         ns-train nerfacto --data $train_dir --output_dir $model_dir --pipeline.datamanager.images-on-gpu True --vis wandb --experiment_name $exp_name --project_name drone_mapping

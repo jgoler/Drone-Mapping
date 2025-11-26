@@ -21,6 +21,7 @@ skip_eval=${3:-0}
 for exp_name in "${experiments[@]}"; do
     ./model_pipeline.bash $exp_name $skip_train $skip_render $skip_eval & 
     pid=$!
+    printf "\n------------------------------------------------\n\n"
     echo "Started pipeline for experiment ${exp_name}. Process ID: ${pid}"
     # wait for the training to finish before starting the next one
     wait $pid
