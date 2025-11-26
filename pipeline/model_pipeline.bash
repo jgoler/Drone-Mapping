@@ -4,8 +4,11 @@
 source ./config.bash
 source ./utils.bash
 
-# Get input argument
-exp_name=$1
+# Get input arguments
+exp_name=$1  
+skip_train=$2
+skip_render=$3
+skip_eval=$4
 
 # Construct the folder paths from the config variables
 train_dir="${proj_dir}/${processed}"
@@ -29,8 +32,7 @@ elif [ -z "$exp_name" ]; then
     exit 1
 fi
 
-# Train the model. Set skip_train=0 to enable training
-skip_train=0
+# Train the model. Set skip_train=0 when running experiment.bash to enable training
 if [ "$skip_train" -ne 0 ]; then
     echo "Skipping training as per the skip_train flag."
 else
@@ -54,7 +56,6 @@ else
 fi
 
 # Extract the model config and render the model
-skip_render=0
 if [ "$skip_render" -ne 0 ]; then
     echo "Skipping rendering as per the skip_render flag."
 else
@@ -74,7 +75,6 @@ else
 fi
 
 # Evaluate the model
-skip_eval=0
 if [ "$skip_eval" -ne 0 ]; then
     echo "Skipping evaluation as per the skip_eval flag."
 else

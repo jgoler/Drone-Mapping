@@ -12,9 +12,14 @@ cd "$(dirname "$0")"
 # load config variables and construct folder paths
 source ./config.bash
 
+# Define the skip flags
+skip_train=${1:-0}
+skip_render=${2:-0}
+skip_eval=${3:-0}
+
 # run nerfstudio on each keyframe folder
 for exp_name in "${experiments[@]}"; do
-    ./model_pipeline.bash $exp_name & 
+    ./model_pipeline.bash $exp_name $skip_train $skip_render $skip_eval & 
     pid=$!
     echo "Started pipeline for experiment ${exp_name}. Process ID: ${pid}"
     # wait for the training to finish before starting the next one
