@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """
 Pipeline for evaluating NeRF / Gaussian Splat renders using PSNR, SSIM, and LPIPS.
+
+*Note: we discovered our camera path was reversed from eval images, so added functionality to reverse predicted images here.*
 """
 
 import numpy as np
@@ -17,7 +19,7 @@ import torch
 from concurrent.futures import ThreadPoolExecutor
 
 
-def load_images_from_folder(folder, frame_numbers=None):
+def load_images_from_folder(folder, frame_numbers=None, reverse=False):
     images = []
     image_nums = []
     for filename in sorted(os.listdir(folder)):
@@ -30,6 +32,8 @@ def load_images_from_folder(folder, frame_numbers=None):
     if frame_numbers is not None:
         indices = np.where(np.isin(image_nums, frame_numbers))[0]
         images = images[indices]
+    if reverse:
+        images = images[::-1]
     return images
 
 
@@ -120,9 +124,12 @@ def main():
 
     # Load images
     print("Loading images...")
-    pred_images = load_images_from_folder(args.model_renders, frame_numbers=None)
+    # Reversing the predicted images to match eval images order
+    pred_images = load_images_from_folder(args.model_renders, frame_numbers=None, reverse=True)
     eval_images_path = os.path.join(config["proj_dir"], config["eval_images"])
     eval_images = load_images_from_folder(eval_images_path, frame_numbers=selected_frame_numbers)
+    print(f"Render path: {args.model_renders}")
+    print(f"Eval images path: {eval_images_path}")
     print(pred_images.shape, eval_images.shape)
 
     # Normalize images if they are not already normalized
@@ -136,6 +143,29 @@ def main():
     assert np.max(eval_images) <= 1.0 and np.min(eval_images) >= 0.0, (
         "Ground truth image is not normalized to [0, 1]"
     )
+
+    # # View 100th image for sanity check
+    # import matplotlib.pyplot as plt
+
+    # idx_to_plot = [99, 100, 101]
+
+    # for i in range(len(idx_to_plot)):
+    #     plt.subplot(3, 3, i + 1)
+    #     plt.imshow(pred_images[idx_to_plot[i]])
+    #     plt.title(f"Predicted Image - {idx_to_plot[i]}th")
+    #     plt.axis("off")
+
+    #     plt.subplot(3, 3, 3 + i + 1)
+    #     plt.imshow(eval_images[idx_to_plot[i]])
+    #     plt.title(f"Eval Image - {idx_to_plot[i]}th")
+    #     plt.axis("off")
+
+    #     plt.subplot(3, 3, 6 + i + 1)
+    #     plt.imshow(pred_images[idx_to_plot[i]] - eval_images[idx_to_plot[i]])
+    #     plt.title(f"Difference Image - {idx_to_plot[i]}th")
+    #     plt.axis("off")
+
+    # plt.show()
 
     print("Calculating PSNR scores...")
     # Vectorized PSNR calculation
