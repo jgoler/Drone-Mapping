@@ -66,8 +66,9 @@ def eval_chunk_on_gpu(pred_chunk, gt_chunk, gpu_id, is_lpips):
     pred = torch.tensor(pred_chunk).permute(0, 3, 1, 2).float()  # NHWC→NCHW
     gt = torch.tensor(gt_chunk).permute(0, 3, 1, 2).float()
 
-    pred = pred * 2 - 1
-    gt = gt * 2 - 1
+    if is_lpips:
+        pred = pred * 2 - 1
+        gt = gt * 2 - 1
 
     pred = pred.to(device, non_blocking=True)
     gt = gt.to(device, non_blocking=True)
@@ -125,7 +126,7 @@ def main():
     # Load images
     print("Loading images...")
     # Reversing the predicted images to match eval images order
-    pred_images = load_images_from_folder(args.model_renders, frame_numbers=None, reverse=True)
+    pred_images = load_images_from_folder(args.model_renders, frame_numbers=None, reverse=False)
     eval_images_path = os.path.join(config["proj_dir"], config["eval_images"])
     eval_images = load_images_from_folder(eval_images_path, frame_numbers=selected_frame_numbers)
     print(f"Render path: {args.model_renders}")
