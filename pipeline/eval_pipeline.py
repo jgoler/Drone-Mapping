@@ -19,7 +19,7 @@ import torch
 from concurrent.futures import ThreadPoolExecutor
 
 
-def load_images_from_folder(folder, frame_numbers=None, reverse=False):
+def load_images_from_folder(folder, frame_numbers=None, reverse=False, return_frame_nums=False):
     images = []
     image_nums = []
     for filename in sorted(os.listdir(folder)):
@@ -27,13 +27,21 @@ def load_images_from_folder(folder, frame_numbers=None, reverse=False):
             img = imread(os.path.join(folder, filename))
             if img is not None:
                 images.append(img)
-                image_nums.append(int(filename.split("_")[-1].split(".")[0]))
+                try:
+                    image_nums.append(int(filename.split("_")[-1].split(".")[0]))
+                except ValueError:
+                    print(f"Warning: Could not parse frame number from filename: {filename}")
+                    image_nums.append(-1)
     images, image_nums = np.array(images), np.array(image_nums)
     if frame_numbers is not None:
         indices = np.where(np.isin(image_nums, frame_numbers))[0]
         images = images[indices]
+        image_nums = image_nums[indices]
     if reverse:
         images = images[::-1]
+        image_nums = image_nums[::-1]
+    if return_frame_nums:
+        return images, image_nums
     return images
 
 
@@ -126,12 +134,38 @@ def main():
     # Load images
     print("Loading images...")
     # Reversing the predicted images to match eval images order
-    pred_images = load_images_from_folder(args.model_renders, frame_numbers=None, reverse=False)
+    pred_images, pred_frame_nums = load_images_from_folder(
+        args.model_renders, frame_numbers=None, reverse=True, return_frame_nums=True
+    )
     eval_images_path = os.path.join(config["proj_dir"], config["eval_images"])
-    eval_images = load_images_from_folder(eval_images_path, frame_numbers=selected_frame_numbers)
+    eval_images, eval_frame_nums = load_images_from_folder(
+        eval_images_path, frame_numbers=selected_frame_numbers, return_frame_nums=True
+    )
     print(f"Render path: {args.model_renders}")
     print(f"Eval images path: {eval_images_path}")
-    print(pred_images.shape, eval_images.shape)
+    print(f"Predicted images shape: {pred_images.shape}")
+    print(f"Eval images shape: {eval_images.shape}")
+
+    # Validation checks
+    if len(pred_images) != len(eval_images):
+        raise ValueError(
+            f"Image count mismatch: {len(pred_images)} predicted images vs {len(eval_images)} eval images. "
+            "Ensure the render and eval folders contain the same number of frames."
+        )
+
+    if pred_images.shape[1:] != eval_images.shape[1:]:
+        raise ValueError(
+            f"Image resolution mismatch: predicted {pred_images.shape[1:]} vs eval {eval_images.shape[1:]}. "
+            "Images must have the same dimensions."
+        )
+
+    # Check frame number alignment (after reversing pred)
+    if not np.array_equal(pred_frame_nums, eval_frame_nums):
+        print(f"Warning: Frame numbers do not match after alignment!")
+        print(f"  Predicted frame nums (first 5): {pred_frame_nums[:5]}")
+        print(f"  Eval frame nums (first 5): {eval_frame_nums[:5]}")
+        print(f"  Predicted frame nums (last 5): {pred_frame_nums[-5:]}")
+        print(f"  Eval frame nums (last 5): {eval_frame_nums[-5:]}")
 
     # Normalize images if they are not already normalized
     pred_images = normalize_images(pred_images)
