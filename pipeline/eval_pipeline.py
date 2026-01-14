@@ -149,8 +149,12 @@ def main():
     parser.add_argument("model_renders", type=str, help="Path to the model renders folder")
     parser.add_argument("output_csv", type=str, help="Path to the output csv")
     parser.add_argument("experiment_name", type=str, help="Name of the experiment")
-    parser.add_argument("--save_comparisons", type=str, default=None,
-                        help="Path to save side-by-side comparison images for debugging")
+    parser.add_argument(
+        "--save_comparisons",
+        type=str,
+        default=None,
+        help="Path to save side-by-side comparison images for debugging",
+    )
     args = parser.parse_args()
 
     # Load config.yaml variables
@@ -188,7 +192,9 @@ def main():
         )
 
     # Check frame number alignment (after reversing pred)
-    if not np.array_equal(pred_frame_nums, eval_frame_nums): # I don't know if we would expect this to be equal, though, because they come from different folders
+    if not np.array_equal(
+        pred_frame_nums, eval_frame_nums
+    ):  # I don't know if we would expect this to be equal, though, because they come from different folders
         print(f"Warning: Frame numbers do not match after alignment!")
         print(f"  Predicted frame nums (first 5): {pred_frame_nums[:5]}")
         print(f"  Eval frame nums (first 5): {eval_frame_nums[:5]}")

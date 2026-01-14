@@ -89,7 +89,7 @@ fi
 if [ "$skip_eval" -ne 0 ]; then
     echo "Skipping evaluation as per the skip_eval flag."
 else
-    ./eval_pipeline.py $render_dir $result_file $exp_name --save_comparisons $comparison_dir
+    ./eval_pipeline.py $render_dir $result_file $exp_name # --save_comparisons $comparison_dir
     if [ $? -ne 0 ]; then
         echo "eval_pipeline.py failed for experiment ${exp_name}. Run the script manually to debug."
         exit 1
