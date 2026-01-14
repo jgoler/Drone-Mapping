@@ -12,7 +12,7 @@ from utils import get_config
 import traceback
 
 # Import metrics for calculations
-from skimage.io import imread
+from skimage.io import imread, imsave
 import lpips
 from pytorch_msssim import ssim
 import torch
@@ -49,6 +49,32 @@ def normalize_images(images):
     if np.max(images) > 1.0:
         images = images / 255.0
     return images
+
+
+def save_comparison_images(pred_images, eval_images, output_folder, frame_nums=None):
+    """Save side-by-side comparison images (predicted | ground truth) for debugging."""
+    os.makedirs(output_folder, exist_ok=True)
+
+    for i in range(len(pred_images)):
+        pred = pred_images[i]
+        gt = eval_images[i]
+
+        # Concatenate horizontally: predicted on left, ground truth on right
+        comparison = np.concatenate([pred, gt], axis=1)
+
+        # Convert to uint8 if normalized
+        if comparison.max() <= 1.0:
+            comparison = (comparison * 255).astype(np.uint8)
+
+        # Use frame number if available, otherwise use index
+        if frame_nums is not None:
+            filename = f"comparison_{frame_nums[i]:04d}.png"
+        else:
+            filename = f"comparison_{i:04d}.png"
+
+        imsave(os.path.join(output_folder, filename), comparison)
+
+    print(f"Saved {len(pred_images)} comparison images to {output_folder}")
 
 
 # ---- Create LPIPS model on each GPU ----
@@ -123,6 +149,8 @@ def main():
     parser.add_argument("model_renders", type=str, help="Path to the model renders folder")
     parser.add_argument("output_csv", type=str, help="Path to the output csv")
     parser.add_argument("experiment_name", type=str, help="Name of the experiment")
+    parser.add_argument("--save_comparisons", type=str, default=None,
+                        help="Path to save side-by-side comparison images for debugging")
     args = parser.parse_args()
 
     # Load config.yaml variables
@@ -160,7 +188,7 @@ def main():
         )
 
     # Check frame number alignment (after reversing pred)
-    if not np.array_equal(pred_frame_nums, eval_frame_nums):
+    if not np.array_equal(pred_frame_nums, eval_frame_nums): # I don't know if we would expect this to be equal, though, because they come from different folders
         print(f"Warning: Frame numbers do not match after alignment!")
         print(f"  Predicted frame nums (first 5): {pred_frame_nums[:5]}")
         print(f"  Eval frame nums (first 5): {eval_frame_nums[:5]}")
@@ -178,6 +206,11 @@ def main():
     assert np.max(eval_images) <= 1.0 and np.min(eval_images) >= 0.0, (
         "Ground truth image is not normalized to [0, 1]"
     )
+
+    # Save comparison images for debugging if requested
+    if args.save_comparisons:
+        print("Saving comparison images...")
+        save_comparison_images(pred_images, eval_images, args.save_comparisons, eval_frame_nums)
 
     # # View 100th image for sanity check
     # import matplotlib.pyplot as plt
