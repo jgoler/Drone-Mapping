@@ -15,6 +15,7 @@ train_dir="${proj_dir}/${processed}"
 model_dir="${proj_dir}/${models}"
 render_dir="${proj_dir}/${renders}/${exp_name}"
 result_file="${proj_dir}/${results}/${exp_name}.csv"
+comparison_dir="${proj_dir}/${results}/${exp_name}_comparisons"
 abs_camera_path="${proj_dir}/${camera_path}"
 
 
@@ -88,7 +89,7 @@ fi
 if [ "$skip_eval" -ne 0 ]; then
     echo "Skipping evaluation as per the skip_eval flag."
 else
-    ./eval_pipeline.py $render_dir $result_file $exp_name
+    ./eval_pipeline.py $render_dir $result_file $exp_name --save_comparisons $comparison_dir
     if [ $? -ne 0 ]; then
         echo "eval_pipeline.py failed for experiment ${exp_name}. Run the script manually to debug."
         exit 1
